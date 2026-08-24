@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% from "partials/badges.html" import verdict_badge, status_badge %}
+{% block title %}Evidence — {{ app_name }}{% endblock %}
+{% block content %}
+<div class="page-header"><div><h1>Evidence</h1>
+<p class="muted">All submissions and their AI verification verdicts. AI agreement: {{ accuracy }}%.</p></div></div>
+{% for row in rows %}
+{% set v = row.evidence.verification %}
+<article class="card">
+  <div class="row-between">
+    <h2>{{ row.evidence.label }}</h2>
+    {% if v %}
+      <span class="badge">AI: {{ v.get('aiVerdict', v.verdict)|capitalize }}</span>
+    {% else %}<span class="badge">Pending</span>{% endif %}
+  </div>
+  <p class="muted small">{{ row.evidence.kind }} · {{ row.evidence.submittedBy }} · {{ row.evidence.at|pretty_date }}
+    {% if row.task %} · task: <a href="{{ url_for('task_detail', task_id=row.task.id) }}">{{ row.task.title }}</a>{% endif %}</p>
+  {% if row.evidence.note %}<p>{{ row.evidence.note }}</p>{% endif %}
+  {% if v %}
+    <p class="small">
+      <strong>AI verdict:</strong> {{ verdict_badge(v.get('aiVerdict', v.verdict)) }}
+      <strong>Confidence:</strong> {{ v.get('aiConfidence', v.confidence)|pct }}
+    </p>
+    <p class="small">{{ v.summary }}</p>
+    {% if v.get('overriddenBy') %}
+      <p class="small">
+        <strong>Final manager decision:</strong>
+        {{ status_badge(v.get('finalStatus', 'Completed')) }}
+        <span class="badge">Overridden by {{ v.overriddenBy }}{% if v.get('overriddenAt') %} · {{ v.overriddenAt|pretty_date }}{% endif %}</span>
+      </p>
+    {% else %}
+      <p class="small"><strong>Final status:</strong> {{ status_badge(v.get('finalStatus', 'Needs Review')) }}</p>
+    {% endif %}
+    <form class="inline" method="post" action="{{ url_for('evidence_override', evidence_id=row.evidence.id) }}">
+      <button class="btn small-btn" name="verdict" value="accept">Accept</button>
+      <button class="btn small-btn" name="verdict" value="reject">Reject</button>
+    </form>
+  {% endif %}
+</article>
+{% else %}<p class="muted">No evidence submitted yet.</p>{% endfor %}
+{% endblock %}

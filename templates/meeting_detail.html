@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% from "partials/badges.html" import status_badge, priority_badge, confidence_badge, progress %}
+{% block title %}{{ meeting.title }} — {{ app_name }}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div><h1>{{ meeting.title }}</h1>
+  <p class="muted">{{ meeting.date|pretty_date }} · {{ meeting.durationMinutes }} min · {{ meeting.organizer }}</p></div>
+  <div class="page-actions">
+    <a class="btn btn-primary" href="{{ url_for('meeting_detail', meeting_id=meeting.id, analyze=1) }}">Run AI analysis</a>
+    <a class="btn" href="{{ url_for('meetings') }}">Back</a>
+  </div>
+</div>
+
+<section class="card">
+  <h2>Transcript</h2>
+  <p class="transcript">{{ meeting.transcript }}</p>
+  <p class="muted small">Participants: {{ meeting.participants|join(', ') or '—' }}</p>
+</section>
+
+{% if drafts or result %}
+<form class="card" method="post" action="{{ url_for('meeting_approve', meeting_id=meeting.id) }}">
+  <h2>AI extraction review</h2>
+  <p class="muted small">{{ result.summary }} · mode: {{ result.mode }}</p>
+  <h3>Action items</h3>
+  {% for d in drafts %}
+  <div class="draft">
+    <input type="hidden" name="draft_id" value="{{ d.id }}" />
+    <input type="hidden" name="source_{{ d.id }}" value="{{ d.sourceStatement }}" />
+    <input type="hidden" name="confidence_{{ d.id }}" value="{{ d.confidence }}" />
+    <label class="checkline"><input type="checkbox" name="approve_{{ d.id }}" checked /> Approve &amp; assign</label>
+    <div class="grid grid-4">
+      <label>Task<input class="input" name="title_{{ d.id }}" value="{{ d.title }}" /></label>
+      <label>Owner
+        <select class="input" name="employee_{{ d.id }}">
+          <option value="">Unassigned</option>
+          {% for e in employees %}<option value="{{ e.id }}" {{ 'selected' if e.id == d.employeeId }}>{{ e.fullName }}</option>{% endfor %}
+        </select>
+      </label>
+      <label>Deadline<input class="input" type="date" name="deadline_{{ d.id }}" value="{{ d.deadline or "" }}" />{% if not d.deadline %}<span class="muted small">No deadline stated in transcript.</span>{% endif %}</label>
+      <label>Priority
+        <select class="input" name="priority_{{ d.id }}">
+          {% for p in ['High','Medium','Low'] %}<option {{ 'selected' if p == d.priority }}>{{ p }}</option>{% endfor %}
+        </select>
+      </label>
+    </div>
+    <p class="muted small">{{ confidence_badge(d.confidence) }} “{{ d.sourceStatement }}”</p>
+  </div>
+  {% else %}<p class="muted">No action items detected.</p>{% endfor %}
+
+  <h3>Decisions</h3>
+  {% for dec in result.decisions %}
+  <div class="draft row-between">
+    <label class="checkline"><input type="checkbox" name="decision_keep_{{ loop.index0 }}" checked /> {{ dec.decision }}</label>
+    <input type="hidden" name="decision_text" value="{{ dec.decision }}" />
+    <input type="hidden" name="decision_category" value="{{ dec.category }}" />
+    <input type="hidden" name="decision_confidence" value="{{ dec.confidence }}" />
+    <span>{{ confidence_badge(dec.confidence) }}</span>
+  </div>
+  {% endfor %}
+  <div class="page-actions"><button class="btn btn-primary" type="submit">Approve, assign &amp; notify owners</button></div>
+</form>
+{% endif %}
+
+<div class="grid grid-2">
+  <section class="card">
+    <h2>Decisions from this meeting</h2>
+    {% for d in decisions %}
+      <div class="list-item"><p>{{ d.text }}</p><p class="muted small">{{ d.category }} · {{ confidence_badge(d.confidence) }}
+      {% if d.revisions %}<span class="badge status-needs-review">Drift: {{ d.revisions|length }} revision(s)</span>{% endif %}</p></div>
+    {% else %}<p class="muted">No decisions recorded yet.</p>{% endfor %}
+  </section>
+  <section class="card">
+    <div class="row-between"><h2>Tasks</h2><span class="muted small">{{ execution.completed }}/{{ execution.tasks }} done</span></div>
+    {{ progress(execution.rate|round|int) }}
+    {% for t in tasks %}
+      <div class="list-item row-between">
+        <a href="{{ url_for('task_detail', task_id=t.id) }}">{{ t.title }}</a>
+        <span>{{ priority_badge(t.priority) }} {{ status_badge(display_status(t)) }}</span>
+      </div>
+    {% else %}<p class="muted">No tasks yet.</p>{% endfor %}
+  </section>
+</div>
+{% endblock %}

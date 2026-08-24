@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% from "partials/badges.html" import status_badge, priority_badge, confidence_badge, verdict_badge, progress %}
+{% block title %}{{ task.title }} — {{ app_name }}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div><h1>{{ task.title }}</h1>
+    <p class="muted">{{ task.ownerName }} · due {{ task.deadline|pretty_date if task.deadline else "No deadline" }} ({{ days_left(task.deadline) }} days) </p></div>
+  <div class="page-actions">{{ priority_badge(task.priority) }} {{ status_badge(display_status(task)) }} {{ confidence_badge(task.confidence) }}</div>
+</div>
+
+<div class="grid grid-2">
+  <section class="card">
+    <h2>Execution</h2>
+    <p>{{ task.description }}</p>
+    {{ progress(task.progress) }}
+    <form class="form" method="post" action="{{ url_for('task_status', task_id=task.id) }}">
+      <div class="grid grid-2">
+        <label>Status<select class="input" name="status">
+          {% for s in ['Pending','In Progress','Submitted','Completed','Needs Review','Rejected'] %}
+            <option {{ 'selected' if s == task.status }}>{{ s }}</option>{% endfor %}
+        </select></label>
+        <label>Progress %<input class="input" type="number" name="progress" min="0" max="100" value="{{ task.progress }}" /></label>
+      </div>
+      <button class="btn btn-primary" type="submit">Update task</button>
+    </form>
+  </section>
+
+  <section class="card">
+    <h2>Source</h2>
+    <p class="muted small">Meeting</p>
+    <p>{% if meeting %}<a href="{{ url_for('meeting_detail', meeting_id=meeting.id) }}">{{ meeting.title }}</a> · {{ meeting.date|pretty_date }}{% else %}—{% endif %}</p>
+    <p class="muted small">Decision</p>
+    <p>{{ decision.text if decision else 'Not linked to a specific decision.' }}</p>
+    <p class="muted small">Original statement</p>
+    <p class="transcript">“{{ task.sourceStatement }}”</p>
+  </section>
+</div>
+
+<section class="card">
+  <h2>Evidence &amp; AI verification</h2>
+  <form class="form" method="post" action="{{ url_for('task_evidence', task_id=task.id) }}" enctype="multipart/form-data">
+    <div class="grid grid-2">
+      <label>Type<select class="input" name="kind"><option value="file">File</option><option value="url">URL</option><option value="text">Description</option></select></label>
+      <label>Label / URL<input class="input" name="label" placeholder="sales_report_august.pdf" /></label>
+    </div>
+    <label>Upload file (optional)<input class="input" type="file" name="evidence_file" /></label>
+    <label>Notes<textarea class="input" name="note" rows="3" placeholder="What does this evidence demonstrate?"></textarea></label>
+    <button class="btn btn-primary" type="submit">Submit evidence for AI verification</button>
+  </form>
+  {% for e in evidence %}
+    <div class="list-item">
+      <div class="row-between"><p class="strong">{{ e.label }}</p>
+        {% if e.verification %}<span class="badge">AI: {{ e.verification.get('aiVerdict', e.verification.verdict)|capitalize }}</span>{% else %}<span class="badge">Pending</span>{% endif %}
+      </div>
+      <p class="muted small">{{ e.kind }} · submitted by {{ e.submittedBy }} on {{ e.at|pretty_date }}</p>
+      {% if e.note %}<p class="small">{{ e.note }}</p>{% endif %}
+      {% if e.verification %}
+        <p class="small"><strong>AI verdict:</strong> {{ verdict_badge(e.verification.get('aiVerdict', e.verification.verdict)) }}
+          <strong>Confidence:</strong> {{ e.verification.get('aiConfidence', e.verification.confidence)|pct }}
+          · {{ e.verification.mode }}</p>
+        <p class="small">{{ e.verification.summary }}</p>
+        {% if e.verification.get('overriddenBy') %}
+          <p class="small"><strong>Final manager decision:</strong> {{ status_badge(e.verification.get('finalStatus', 'Completed')) }}
+            <span class="badge">Overridden by {{ e.verification.overriddenBy }}</span></p>
+        {% else %}
+          <p class="small"><strong>Final status:</strong> {{ status_badge(e.verification.get('finalStatus', 'Needs Review')) }}</p>
+        {% endif %}
+        {% if current_user.role in ['admin','manager'] %}
+        <form class="inline" method="post" action="{{ url_for('evidence_override', evidence_id=e.id) }}">
+          <button class="btn small-btn" name="verdict" value="accept">Accept</button>
+          <button class="btn small-btn" name="verdict" value="reject">Reject</button>
+        </form>
+        {% endif %}
+      {% endif %}
+    </div>
+  {% else %}<p class="muted">No evidence submitted yet.</p>{% endfor %}
+</section>
+
+<div class="grid grid-2">
+  <section class="card">
+    <h2>Comments</h2>
+    {% for c in task.comments %}<div class="list-item"><p>{{ c.text }}</p><p class="muted small">{{ c.author }} · {{ c.at|pretty_date }}</p></div>
+    {% else %}<p class="muted">No comments yet.</p>{% endfor %}
+    <form class="form" method="post" action="{{ url_for('task_comment', task_id=task.id) }}">
+      <textarea class="input" name="text" rows="2" placeholder="Add a comment"></textarea>
+      <button class="btn" type="submit">Post comment</button>
+    </form>
+  </section>
+  <section class="card">
+    <h2>Activity</h2>
+    <ol class="timeline">
+      {% for a in task.activity %}<li><span class="dot"></span><div><p>{{ a.message }}</p><p class="muted small">{{ a.actor }} · {{ a.at|pretty_date }}</p></div></li>{% endfor %}
+    </ol>
+  </section>
+</div>
+{% endblock %}

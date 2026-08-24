@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% from "partials/badges.html" import stat_card, bar_chart, progress %}
+{% block title %}Analytics — {{ app_name }}{% endblock %}
+{% block content %}
+<div class="page-header"><div><h1>Execution analytics</h1><p class="muted">How reliably decisions turn into delivered work.</p></div></div>
+<div class="grid grid-4">
+  {{ stat_card('Execution rate', stats.executionRate ~ '%', stats.completed ~ ' completed') }}
+  {{ stat_card('Overdue', stats.overdue, 'past deadline') }}
+  {{ stat_card('Avg. completion', avg_days ~ ' days', 'from assignment to done') }}
+  {{ stat_card('AI agreement', accuracy ~ '%', 'AI verdict accepted without override') }}
+</div>
+<div class="grid grid-2">
+  <section class="card"><h2>Status distribution</h2>{{ bar_chart(status_data, 'value') }}</section>
+  <section class="card"><h2>Completion rate over time</h2>{{ bar_chart(trend, 'rate') }}</section>
+</div>
+<section class="card">
+  <h2>Per-employee execution</h2>
+  <table class="table"><thead><tr><th>Employee</th><th>Total</th><th>Completed</th><th>Overdue</th><th>Rate</th></tr></thead><tbody>
+    {% for r in employee_data %}<tr><td>{{ r.fullName }}</td><td>{{ r.total }}</td><td>{{ r.completed }}</td><td>{{ r.overdue }}</td>
+      <td>{{ progress(((r.completed / r.total * 100) if r.total else 0)|round|int) }}</td></tr>{% endfor %}
+  </tbody></table>
+</section>
+<section class="card">
+  <h2>Per-meeting execution</h2>
+  <table class="table"><thead><tr><th>Meeting</th><th>Date</th><th>Tasks</th><th>Completed</th><th>Rate</th></tr></thead><tbody>
+    {% for r in meeting_rows %}<tr><td>{{ r.meeting.title }}</td><td>{{ r.meeting.date|pretty_date }}</td>
+      <td>{{ r.exec.tasks }}</td><td>{{ r.exec.completed }}</td><td>{{ progress(r.exec.rate|round|int) }}</td></tr>{% endfor %}
+  </tbody></table>
+</section>
+{% endblock %}

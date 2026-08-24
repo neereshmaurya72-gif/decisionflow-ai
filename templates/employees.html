@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Employees — {{ app_name }}{% endblock %}
+{% block content %}
+<div class="page-header"><div><h1>Employees</h1><p class="muted">Directory, roles and per-person execution.</p></div></div>
+<section class="card">
+  <table class="table">
+    <thead><tr><th>Code</th><th>Name</th><th>Email</th><th>Department</th><th>Role</th><th>Tasks</th><th>Done</th><th>Overdue</th></tr></thead>
+    <tbody>
+    {% for row in rows %}
+      <tr>
+        <td>{{ row.employee.employeeCode }}</td><td>{{ row.employee.fullName }}</td><td>{{ row.employee.email }}</td>
+        <td>{{ row.employee.department }}</td><td><span class="badge">{{ row.employee.role }}</span></td>
+        <td>{{ row.total }}</td><td>{{ row.completed }}</td><td>{{ row.overdue }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+<section class="card">
+  <h2>Add employee</h2>
+  <form class="form" method="post">
+    <div class="grid grid-3">
+      <label>Employee code<input class="input" name="employeeCode" required /></label>
+      <label>Full name<input class="input" name="fullName" required /></label>
+      <label>Email<input class="input" type="email" name="email" required /></label>
+      <label>Department<input class="input" name="department" /></label>
+      <label>Job role<input class="input" name="jobRole" /></label>
+      <label>Access role<select class="input" name="role"><option>employee</option><option>manager</option><option>admin</option></select></label>
+    </div>
+    <button class="btn btn-primary" type="submit">Add employee</button>
+  </form>
+</section>
+{% endblock %}

@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Access denied — {{ app_name }}{% endblock %}
+{% block content %}
+<section class="card">
+  <h1>Access denied</h1>
+  <p class="muted">You do not have permission to access this page or modify this item.</p>
+  <a class="btn btn-primary" href="{{ url_for('dashboard') }}">Back to dashboard</a>
+</section>
+{% endblock %}

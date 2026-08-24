@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% from "partials/badges.html" import confidence_badge, status_badge %}
+{% block title %}Decisions — {{ app_name }}{% endblock %}
+{% block content %}
+<div class="page-header"><div><h1>Decisions</h1>
+<p class="muted">Every decision captured from meetings, with drift detection when it changes later.</p></div></div>
+{% for row in rows %}
+<article class="card">
+  <div class="row-between">
+    <h2>{{ row.decision.text }}</h2>
+    <span>{{ confidence_badge(row.decision.confidence) }}<span class="badge">{{ row.decision.category }}</span></span>
+  </div>
+  <p class="muted small">{{ row.meeting.title if row.meeting else 'Unknown meeting' }} · {{ row.decision.createdAt|pretty_date }}</p>
+  {% if row.decision.revisions %}
+    <div class="drift">
+      <p class="strong">Decision drift detected</p>
+      {% for rev in row.decision.revisions %}
+        <p class="small">{{ rev.at|pretty_date }} — {{ rev.text }} <span class="muted">({{ rev.note }})</span></p>
+      {% endfor %}
+      {% if row.drift %}<p class="small">Deadline moved by {{ row.drift.deltaDays }} day(s): {{ row.drift.original }} → {{ row.drift.current }}</p>{% endif %}
+    </div>
+  {% endif %}
+  {% if row.tasks %}
+  <p class="muted small">Linked tasks:</p>
+  {% for t in row.tasks %}<div class="list-item row-between"><a href="{{ url_for('task_detail', task_id=t.id) }}">{{ t.title }}</a>{{ status_badge(t.status) }}</div>{% endfor %}
+  {% endif %}
+</article>
+{% else %}<p class="muted">No decisions recorded.</p>{% endfor %}
+{% endblock %}

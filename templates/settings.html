@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Settings — {{ app_name }}{% endblock %}
+{% block content %}
+<div class="page-header"><div><h1>Settings</h1><p class="muted">Application status and demo data.</p></div></div>
+<div class="grid grid-2">
+  <section class="card">
+    <h2>Meeting Analysis</h2>
+    <p>Status: <span class="badge status-completed">Active</span></p>
+    <p class="muted">Built-in rule-based extraction engine</p>
+    <p class="small muted">The application analyzes meeting text using predefined rules and heuristics to identify decisions, tasks, owners, priorities and deadlines.</p>
+  </section>
+  <section class="card">
+    <h2>Notifications</h2>
+    <p>Status: <span class="badge status-completed">Active</span></p>
+    <p class="muted">Built-in in-app notification system</p>
+    <p class="small muted">Task and workflow notifications are stored and displayed inside DecisionFlow AI.</p>
+  </section>
+</div>
+{% if current_user.role in ['admin', 'manager'] %}
+<section class="card">
+  <h2>Demo data</h2>
+  <p class="muted">Restore the original seeded meetings, decisions, tasks, evidence and notifications.</p>
+  <form method="post" action="{{ url_for('settings_reset') }}"><button class="btn btn-primary" type="submit">Reset demo data</button></form>
+</section>
+{% endif %}
+{% endblock %}

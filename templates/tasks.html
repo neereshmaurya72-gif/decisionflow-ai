@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% from "partials/badges.html" import status_badge, priority_badge, progress %}
+{% block title %}Tasks — {{ app_name }}{% endblock %}
+{% block content %}
+<div class="page-header"><div><h1>Tasks</h1><p class="muted">Filter, track and open any assigned action item.</p></div></div>
+<form class="card filters" method="get">
+  <input class="input" name="q" value="{{ q }}" placeholder="Search task or owner" />
+  <select class="input" name="status">
+    {% for s in ['All','Pending','In Progress','Submitted','Completed','Needs Review','Rejected','Overdue'] %}
+      <option {{ 'selected' if s == status }}>{{ s }}</option>{% endfor %}
+  </select>
+  <select class="input" name="priority">
+    {% for p in ['All','High','Medium','Low'] %}<option {{ 'selected' if p == priority }}>{{ p }}</option>{% endfor %}
+  </select>
+  <select class="input" name="owner">
+    <option value="All">All owners</option>
+    {% for e in all_employees %}<option value="{{ e.id }}" {{ 'selected' if e.id == owner }}>{{ e.fullName }}</option>{% endfor %}
+  </select>
+  <button class="btn btn-primary" type="submit">Apply</button>
+</form>
+<section class="card">
+  <table class="table">
+    <thead><tr><th>Task</th><th>Owner</th><th>Deadline</th><th>Priority</th><th>Status</th><th>Progress</th></tr></thead>
+    <tbody>
+    {% for t in rows %}
+      <tr>
+        <td><a href="{{ url_for('task_detail', task_id=t.id) }}">{{ t.title }}</a></td>
+        <td>{{ t.ownerName }}</td>
+        <td>{{ t.deadline|pretty_date if t.deadline else "No deadline" }}<span class="muted small"> · {{ days_left(t.deadline) }}d</span></td>
+        <td>{{ priority_badge(t.priority) }}</td>
+        <td>{{ status_badge(display_status(t)) }}</td>
+        <td>{{ progress(t.progress) }}</td>
+      </tr>
+    {% else %}<tr><td colspan="6" class="muted">No tasks match these filters.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

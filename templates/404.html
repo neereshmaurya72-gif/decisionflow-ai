@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Page not found — {{ app_name }}{% endblock %}
+{% block content %}
+<div class="card empty-state">
+  <h1>404</h1>
+  <p class="strong">Page not found</p>
+  <p class="muted">The page you're looking for doesn't exist or has been moved.</p>
+  <a class="btn btn-primary" href="{{ url_for('dashboard') }}">Go home</a>
+</div>
+{% endblock %}

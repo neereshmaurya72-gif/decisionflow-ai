@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Notifications — {{ app_name }}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div><h1>Notifications outbox</h1>
+  <p class="muted">Email mode: {{ 'live delivery' if email_mode == 'live' else 'preview (demo outbox)' }}.</p></div>
+  <div class="page-actions"><form method="post" action="{{ url_for('notification_sweep') }}">
+    <button class="btn btn-primary" type="submit">Run reminder sweep</button></form></div>
+</div>
+{% for n in items %}
+<article class="card {{ 'unread' if not n.read }}">
+  <div class="row-between">
+    <h2>{{ n.subject }}</h2>
+    <span><span class="badge type-{{ n.type }}">{{ n.type }}</span>{% if not n.read %}<span class="badge status-pending">unread</span>{% endif %}</span>
+  </div>
+  <p class="muted small">To {{ n.toName }} &lt;{{ n.to }}&gt; · {{ n.at|pretty_date }}</p>
+  <pre class="email-body">{{ n.body }}</pre>
+  <div class="page-actions">
+    {% if n.taskId %}<a class="btn small-btn" href="{{ url_for('task_detail', task_id=n.taskId) }}">Open task</a>{% endif %}
+    {% if not n.read %}<form method="post" action="{{ url_for('notification_read', notification_id=n.id) }}">
+      <button class="btn small-btn" type="submit">Mark read</button></form>{% endif %}
+  </div>
+</article>
+{% else %}<p class="muted">No notifications.</p>{% endfor %}
+{% endblock %}

@@ -1,0 +1,207 @@
+"""Seed data for DecisionFlow AI (ported from the original demo dataset)."""
+
+
+def build_demo_state():
+    return {
+        "currentUserId": "u-admin",
+        "employees": [
+            {"id": "u-admin", "employeeCode": "EMP-001", "fullName": "Aarav Mehta",
+             "email": "aarav@example.com", "department": "Operations",
+             "jobRole": "Program Director", "role": "admin", "active": True},
+            {"id": "u-manager", "employeeCode": "EMP-002", "fullName": "Kavita Rao",
+             "email": "kavita@example.com", "department": "Product",
+             "jobRole": "Delivery Manager", "role": "manager", "active": True},
+            {"id": "u-rahul", "employeeCode": "EMP-101", "fullName": "Rahul Sharma",
+             "email": "rahul@example.com", "department": "Sales",
+             "jobRole": "Sales Analyst", "role": "employee", "active": True},
+            {"id": "u-neer", "employeeCode": "EMP-102", "fullName": "Neer Maurya",
+             "email": "neer@example.com", "department": "Marketing",
+             "jobRole": "Marketing Associate", "role": "employee", "active": True},
+            {"id": "u-priya", "employeeCode": "EMP-103", "fullName": "Priya Singh",
+             "email": "priya@example.com", "department": "Engineering",
+             "jobRole": "QA Engineer", "role": "employee", "active": True},
+        ],
+        "meetings": [
+            {
+                "id": "m-1",
+                "title": "Weekly Product Meeting",
+                "date": "2026-08-07",
+                "organizer": "Aarav Mehta",
+                "participants": ["Aarav Mehta", "Kavita Rao", "Rahul Sharma", "Neer Maurya", "Priya Singh"],
+                "durationMinutes": 45,
+                "recordingName": "weekly-product-meeting.mp3",
+                "transcript": (
+                    "Aarav: Good morning everyone. Let's start with the launch timeline. Kavita: From the "
+                    "product side, we're still targeting August 20, assuming there are no blockers. Rahul: "
+                    "I'll pull the August sales numbers from the CRM and prepare the sales report by August "
+                    "14. Aarav: Great, please share it with the leadership team once the numbers are checked. "
+                    "Neer: I'll take the customer presentation and have that ready by August 17. Priya: I'll "
+                    "run the website QA pass by August 18 and flag anything that could affect the launch. "
+                    "Kavita: One more thing, let's freeze new feature requests until after launch so the team "
+                    "can focus on the current scope. Aarav: Agreed. Let's keep August 20 as the target and "
+                    "raise any blockers in the next sync."
+                ),
+                "analyzed": True,
+            },
+            {
+                "id": "m-2",
+                "title": "Weekly Sales Meeting",
+                "date": "2026-07-31",
+                "organizer": "Kavita Rao",
+                "participants": ["Kavita Rao", "Rahul Sharma", "Neer Maurya"],
+                "durationMinutes": 30,
+                "recordingName": None,
+                "transcript": (
+                    "Kavita: Let's go through the pipeline quickly. Rahul, can you refresh the enterprise "
+                    "pipeline forecast with the latest July actuals and get it done by August 5? Rahul: Yes, "
+                    "I'll update the forecast and send it over. Neer: I'll update the campaign landing page "
+                    "by August 6, mainly the hero copy and CTA. Kavita: Good. And for this quarter, let's "
+                    "prioritize the enterprise segment. If there are any risks in the pipeline numbers, flag "
+                    "them before the next review."
+                ),
+                "analyzed": True,
+            },
+            {
+                "id": "m-3",
+                "title": "Launch Readiness Sync",
+                "date": "2026-08-08",
+                "organizer": "Aarav Mehta",
+                "participants": ["Aarav Mehta", "Kavita Rao", "Priya Singh"],
+                "durationMinutes": 25,
+                "recordingName": None,
+                "transcript": (
+                    "Aarav: Quick launch-readiness check. We heard back from the payment provider that the "
+                    "production review is taking longer than expected, so the website launch is moving from "
+                    "August 20 to August 30. Kavita: That works for product, but we need to make sure the "
+                    "testing window is still covered. Priya: I'll prepare the regression test plan by August "
+                    "12 and call out anything that needs another pass. Aarav: Perfect. We'll keep the revised "
+                    "date for now and revisit it when the payment provider confirms the final approval."
+                ),
+                "analyzed": True,
+            },
+        ],
+        "decisions": [
+            {"id": "d-1", "meetingId": "m-1", "text": "Website launch date is August 20.",
+             "category": "Product", "confidence": 0.94, "createdAt": "2026-08-07",
+             "revisions": [{"at": "2026-08-08", "text": "Website launch has moved to August 30.",
+                            "note": "Raised in Launch Readiness Sync (payment provider review)."}]},
+            {"id": "d-2", "meetingId": "m-1", "text": "Rahul will prepare the sales report by August 14, 2026.",
+             "category": "Sales", "confidence": 0.96, "createdAt": "2026-08-07", "revisions": []},
+            {"id": "d-3", "meetingId": "m-1", "text": "Neer will create the customer presentation by August 17, 2026.",
+             "category": "Marketing", "confidence": 0.91, "createdAt": "2026-08-07", "revisions": []},
+            {"id": "d-4", "meetingId": "m-1", "text": "Priya will run the website QA pass by August 18, 2026.",
+             "category": "Engineering", "confidence": 0.89, "createdAt": "2026-08-07", "revisions": []},
+            {"id": "d-5", "meetingId": "m-2", "text": "Prioritize the enterprise segment this quarter.",
+             "category": "Sales", "confidence": 0.87, "createdAt": "2026-07-31", "revisions": []},
+        ],
+        "tasks": [
+            {
+                "id": "t-1", "title": "Prepare the sales report",
+                "description": "Consolidate August sales performance and share the report with the leadership team.",
+                "meetingId": "m-1", "decisionId": "d-2", "ownerName": "Rahul Sharma",
+                "employeeId": "u-rahul", "deadline": "2026-08-14", "priority": "High",
+                "status": "In Progress", "progress": 55, "confidence": 0.96,
+                "sourceStatement": "Rahul will prepare the sales report by August 14.",
+                "approved": True, "createdAt": "2026-08-07", "completedAt": None,
+                "comments": [{"id": "c-1", "author": "Rahul Sharma",
+                              "text": "Pulling numbers from the CRM today.", "at": "2026-08-08"}],
+                "activity": [
+                    {"id": "a-1", "at": "2026-08-07", "actor": "Aarav Mehta",
+                     "message": "Task created from Weekly Product Meeting"},
+                    {"id": "a-2", "at": "2026-08-08", "actor": "Rahul Sharma",
+                     "message": "Status changed to In Progress"},
+                ],
+            },
+            {
+                "id": "t-2", "title": "Create the customer presentation",
+                "description": "Build the customer-facing launch presentation deck.",
+                "meetingId": "m-1", "decisionId": "d-3", "ownerName": "Neer Maurya",
+                "employeeId": "u-neer", "deadline": "2026-08-17", "priority": "Medium",
+                "status": "Pending", "progress": 0, "confidence": 0.91,
+                "sourceStatement": "Neer will create the customer presentation by August 17.",
+                "approved": True, "createdAt": "2026-08-07", "completedAt": None,
+                "comments": [],
+                "activity": [{"id": "a-3", "at": "2026-08-07", "actor": "Aarav Mehta",
+                              "message": "Task created from Weekly Product Meeting"}],
+            },
+            {
+                "id": "t-3", "title": "Run the website QA pass",
+                "description": "Full regression pass on the marketing website before launch.",
+                "meetingId": "m-1", "decisionId": "d-4", "ownerName": "Priya Singh",
+                "employeeId": "u-priya", "deadline": "2026-08-18", "priority": "High",
+                "status": "Pending", "progress": 10, "confidence": 0.89,
+                "sourceStatement": "Priya will run the website QA pass by August 18.",
+                "approved": True, "createdAt": "2026-08-07", "completedAt": None,
+                "comments": [],
+                "activity": [{"id": "a-4", "at": "2026-08-07", "actor": "Aarav Mehta",
+                              "message": "Task created from Weekly Product Meeting"}],
+            },
+            {
+                "id": "t-4", "title": "Refresh the enterprise pipeline forecast",
+                "description": "Update the enterprise pipeline forecast model with July actuals.",
+                "meetingId": "m-2", "decisionId": "d-5", "ownerName": "Rahul Sharma",
+                "employeeId": "u-rahul", "deadline": "2026-08-05", "priority": "High",
+                "status": "Completed", "progress": 100, "confidence": 0.93,
+                "sourceStatement": "Rahul will refresh the enterprise pipeline forecast by August 5.",
+                "approved": True, "createdAt": "2026-07-31", "completedAt": "2026-08-04",
+                "comments": [],
+                "activity": [
+                    {"id": "a-5", "at": "2026-07-31", "actor": "Kavita Rao",
+                     "message": "Task created from Weekly Sales Meeting"},
+                    {"id": "a-6", "at": "2026-08-04", "actor": "DecisionFlow AI",
+                     "message": "Evidence verified — task completed"},
+                ],
+            },
+            {
+                "id": "t-5", "title": "Update the campaign landing page",
+                "description": "Refresh hero copy and CTA on the summer campaign landing page.",
+                "meetingId": "m-2", "decisionId": None, "ownerName": "Neer Maurya",
+                "employeeId": "u-neer", "deadline": "2026-08-06", "priority": "Medium",
+                "status": "In Progress", "progress": 40, "confidence": 0.88,
+                "sourceStatement": "Neer will update the campaign landing page by August 6.",
+                "approved": True, "createdAt": "2026-07-31", "completedAt": None,
+                "comments": [],
+                "activity": [{"id": "a-7", "at": "2026-07-31", "actor": "Kavita Rao",
+                              "message": "Task created from Weekly Sales Meeting"}],
+            },
+            {
+                "id": "t-6", "title": "Prepare the regression test plan",
+                "description": "Document the regression test plan for the delayed launch window.",
+                "meetingId": "m-3", "decisionId": None, "ownerName": "Priya Singh",
+                "employeeId": "u-priya", "deadline": "2026-08-12", "priority": "Medium",
+                "status": "Pending", "progress": 0, "confidence": 0.9,
+                "sourceStatement": "Priya will prepare the regression test plan by August 12.",
+                "approved": True, "createdAt": "2026-08-08", "completedAt": None,
+                "comments": [],
+                "activity": [{"id": "a-8", "at": "2026-08-08", "actor": "Aarav Mehta",
+                              "message": "Task created from Launch Readiness Sync"}],
+            },
+        ],
+        "evidence": [
+            {
+                "id": "e-1", "taskId": "t-4", "kind": "file",
+                "label": "enterprise_pipeline_forecast_august.xlsx",
+                "note": "Updated enterprise pipeline forecast with July actuals and August projection.",
+                "submittedBy": "Rahul Sharma", "at": "2026-08-04",
+                "verification": {
+                    "verdict": "match", "confidence": 0.94,
+                    "summary": "Evidence appears to satisfy the assigned task (matched on: enterprise, pipeline, forecast).",
+                    "mode": "demo", "at": "2026-08-04", "overriddenBy": None,
+                },
+            }
+        ],
+        "notifications": [
+            {"id": "n-1", "type": "assignment", "to": "rahul@example.com", "toName": "Rahul Sharma",
+             "subject": "New Task Assigned: Prepare the sales report",
+             "body": "Hi Rahul,\n\nA new task has been assigned to you from a recent meeting.\n\nTask: Prepare the sales report\nDeadline: August 14, 2026\nPriority: High\n\nPlease open your DecisionFlow AI dashboard to view the complete task details and update your progress.\n\nRegards,\nDecisionFlow AI",
+             "at": "2026-08-07", "read": True, "taskId": "t-1"},
+            {"id": "n-2", "type": "assignment", "to": "neer@example.com", "toName": "Neer Maurya",
+             "subject": "New Task Assigned: Create the customer presentation",
+             "body": "Hi Neer,\n\nA new task has been assigned to you from a recent meeting.\n\nTask: Create the customer presentation\nDeadline: August 17, 2026\nPriority: Medium\n\nPlease open your DecisionFlow AI dashboard to view the complete task details and update your progress.\n\nRegards,\nDecisionFlow AI",
+             "at": "2026-08-07", "read": False, "taskId": "t-2"},
+            {"id": "n-3", "type": "overdue", "to": "neer@example.com", "toName": "Neer Maurya",
+             "subject": "Overdue: Update the campaign landing page",
+             "body": "Hi Neer,\n\nYour task \"Update the campaign landing page\" passed its deadline on August 6, 2026.\n\nRegards,\nDecisionFlow AI",
+             "at": "2026-08-07", "read": False, "taskId": "t-5"},
+        ],
+    }

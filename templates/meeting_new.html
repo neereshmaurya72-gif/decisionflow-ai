@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}New meeting analysis — {{ app_name }}{% endblock %}
+{% block content %}
+<div class="page-header"><div><h1>New meeting analysis</h1>
+<p class="muted">Paste a transcript or upload a .txt/.vtt file. The AI extracts decisions and action items.</p></div></div>
+<form class="card form" method="post" enctype="multipart/form-data">
+  <div class="grid grid-2">
+    <label>Meeting title<input class="input" name="title" required placeholder="Weekly Product Meeting" /></label>
+    <label>Date<input class="input" type="date" name="date" value="{{ today }}" required /></label>
+    <label>Organizer<input class="input" name="organizer" value="{{ current_user.fullName }}" /></label>
+    <label>Duration (minutes)<input class="input" type="number" name="duration" value="30" min="1" /></label>
+    <label>Participants (comma separated)<input class="input" name="participants" placeholder="Rahul Sharma, Neer Maurya" /></label>
+    <label>Recording name (optional)<input class="input" name="recording_name" placeholder="weekly-product-meeting.mp3" /></label>
+  </div>
+  <label>Transcript<textarea class="input" name="transcript" rows="10" placeholder="Aarav: Rahul will prepare the sales report by August 14..."></textarea></label>
+  <label>Or upload a transcript file<input class="input" type="file" name="transcript_file" accept=".txt,.vtt,.srt,.md" /></label>
+  <div class="page-actions">
+    <button class="btn btn-primary" type="submit">Save &amp; run AI analysis</button>
+    <a class="btn" href="{{ url_for('meetings') }}">Cancel</a>
+  </div>
+</form>
+{% endblock %}

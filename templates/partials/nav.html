@@ -1,0 +1,9 @@
+{% import "partials/icons.html" as ic %}
+<nav class="nav">
+  {% for item in nav %}
+    {% set href = url_for(item.to) %}
+    <a class="nav-link {{ 'active' if (request.path == href) or (href != '/' and request.path.startswith(href)) }}" href="{{ href }}">
+      {{ ic.icon(item.icon) }} <span>{{ item.label }}</span>
+    </a>
+  {% endfor %}
+</nav>

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% from "partials/badges.html" import status_badge, progress %}
+{% block title %}Meeting → Execution — {{ app_name }}{% endblock %}
+{% block content %}
+<div class="page-header"><div><h1>Meeting → Execution</h1>
+<p class="muted">The full chain: conversation, decision, task, evidence, verification.</p></div></div>
+{% for row in rows %}
+<article class="card">
+  <div class="row-between">
+    <h2>{{ row.meeting.title }}</h2>
+    <span class="muted small">{{ row.meeting.date|pretty_date }} · {{ row.exec.rate }}% executed</span>
+  </div>
+  {{ progress(row.exec.rate|round|int) }}
+  <div class="chain">
+    <div class="chain-col"><p class="chain-title">Decisions</p>
+      {% for d in row.decisions %}<p class="chain-item">{{ d.text }}</p>{% else %}<p class="muted small">None</p>{% endfor %}</div>
+    <div class="chain-arrow">→</div>
+    <div class="chain-col"><p class="chain-title">Tasks</p>
+      {% for t in row.tasks %}<p class="chain-item"><a href="{{ url_for('task_detail', task_id=t.id) }}">{{ t.title }}</a> {{ status_badge(display_status(t)) }}</p>{% else %}<p class="muted small">None</p>{% endfor %}</div>
+    <div class="chain-arrow">→</div>
+    <div class="chain-col"><p class="chain-title">Evidence</p>
+      {% for e in row.evidence %}<p class="chain-item">{{ e.label }} — {{ e.verification.verdict if e.verification else 'pending' }}</p>{% else %}<p class="muted small">None</p>{% endfor %}</div>
+  </div>
+</article>
+{% endfor %}
+{% endblock %}

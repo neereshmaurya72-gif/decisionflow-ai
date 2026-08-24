@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}{{ app_name }} — Meeting Decisions to Real Execution{% endblock %}</title>
+  <meta name="description" content="{% block description %}DecisionFlow AI turns meeting conversations into accountable tasks, tracks execution and verifies evidence with AI.{% endblock %}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+{% import "partials/icons.html" as ic %}
+
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-inner">
+      {% include "partials/brand.html" %}
+      {% include "partials/nav.html" %}
+
+      <div class="sidebar-spacer"></div>
+      <div class="sidebar-note">
+        <div class="ai-status">
+          <span class="status-pulse"></span>
+          <span>Rule-based engine active</span>
+        </div>
+        <p>Built-in rules extract decisions, tasks, owners and deadlines from meeting transcripts.</p>
+      </div>
+    </div>
+  </aside>
+
+  <div class="app-main">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="icon-btn menu-toggle" type="button" id="menuToggle" aria-label="Open navigation">
+          {{ ic.icon('menu') }}
+        </button>
+        <div class="topbar-title">
+          <span class="eyebrow">DecisionFlow AI</span>
+          <span class="tagline">From meeting decisions to real execution</span>
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <a class="icon-btn notification-btn" href="{{ url_for('notifications') }}" aria-label="Notifications">
+          {{ ic.icon('bell') }}
+          {% if unread_count %}<span class="badge-dot">{{ unread_count }}</span>{% endif %}
+        </a>
+
+        <div class="user-menu">
+          <div class="avatar">{{ current_user.fullName[:1]|upper }}</div>
+          <div class="user-meta">
+            <strong>{{ current_user.fullName }}</strong>
+            <span>{{ current_user.role|capitalize }} · {{ current_user.department }}</span>
+          </div>
+          <form method="post" action="{{ url_for('switch_user') }}">
+            <select name="user_id" class="select user-switcher" onchange="this.form.submit()" aria-label="Switch user">
+              {% for e in all_employees %}
+                <option value="{{ e.id }}" {{ 'selected' if e.id == current_user.id }}>{{ e.fullName }} · {{ e.role }}</option>
+              {% endfor %}
+            </select>
+          </form>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="flashes">
+            {% for category, message in messages %}
+              <div class="flash flash-{{ category }}">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</div>
+
+<div class="mobile-overlay" id="mobileOverlay"></div>
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

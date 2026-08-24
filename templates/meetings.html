@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% from "partials/badges.html" import progress %}
+{% block title %}Meetings — {{ app_name }}{% endblock %}
+{% block content %}
+<div class="page-header">
+  <div><h1>Meetings</h1><p class="muted">Every analyzed conversation and how much of it actually got executed.</p></div>
+  <div class="page-actions"><a class="btn btn-primary" href="{{ url_for('meeting_new') }}">New meeting</a></div>
+</div>
+<div class="grid grid-2">
+  {% for row in rows %}
+  <article class="card">
+    <div class="row-between">
+      <h2><a href="{{ url_for('meeting_detail', meeting_id=row.meeting.id) }}">{{ row.meeting.title }}</a></h2>
+      <span class="badge {{ 'status-completed' if row.meeting.analyzed else 'status-pending' }}">{{ 'Analyzed' if row.meeting.analyzed else 'Not analyzed' }}</span>
+    </div>
+    <p class="muted small">{{ row.meeting.date|pretty_date }} · {{ row.meeting.durationMinutes }} min · organized by {{ row.meeting.organizer }}</p>
+    <p class="clamp">{{ row.meeting.transcript }}</p>
+    <p class="muted small">{{ row.meeting.participants|length }} participants</p>
+    <div class="row-between small"><span>Execution</span><span>{{ row.exec.completed }}/{{ row.exec.tasks }} · {{ row.exec.rate }}%</span></div>
+    {{ progress(row.exec.rate|round|int) }}
+  </article>
+  {% else %}
+  <p class="muted">No meetings yet.</p>
+  {% endfor %}
+</div>
+{% endblock %}

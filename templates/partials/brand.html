@@ -1,0 +1,8 @@
+{% import "partials/icons.html" as ic %}
+<a class="brand" href="{{ url_for('dashboard') }}">
+  <span class="brand-mark">{{ ic.icon('branch') }}</span>
+  <span>
+    <span class="brand-name">{{ app_name }}</span>
+    <span class="brand-tag">Decisions to real execution</span>
+  </span>
+</a>

@@ -1,0 +1,43 @@
+{% macro status_badge(status) %}
+<span class="badge status-{{ status|lower|replace(' ', '-') }}">{{ status }}</span>
+{% endmacro %}
+
+{% macro priority_badge(priority) %}
+<span class="badge priority-{{ priority|lower }}">{{ priority }}</span>
+{% endmacro %}
+
+{% macro confidence_badge(value) %}
+{% set pct = (value * 100)|round|int %}
+<span class="badge confidence {{ 'conf-high' if pct >= 85 else ('conf-mid' if pct >= 65 else 'conf-low') }}">{{ pct }}% confidence</span>
+{% endmacro %}
+
+{% macro verdict_badge(verdict) %}
+<span class="badge verdict-{{ verdict }}">{{ verdict }}</span>
+{% endmacro %}
+
+{% macro progress(value) %}
+<div class="progress" role="progressbar" aria-valuenow="{{ value }}" aria-valuemin="0" aria-valuemax="100">
+  <span style="width: {{ value }}%"></span>
+</div>
+{% endmacro %}
+
+{% macro stat_card(label, value, hint) %}
+<div class="card stat-card">
+  <p class="stat-label">{{ label }}</p>
+  <p class="stat-value">{{ value }}</p>
+  {% if hint %}<p class="muted small">{{ hint }}</p>{% endif %}
+</div>
+{% endmacro %}
+
+{% macro bar_chart(rows, key, label_key='name', max_hint=0) %}
+{% set maxv = [rows|map(attribute=key)|max, max_hint, 1]|max %}
+<div class="bar-chart">
+  {% for row in rows %}
+    <div class="bar-row">
+      <span class="bar-label">{{ row[label_key] }}</span>
+      <span class="bar-track"><span class="bar-fill" style="width: {{ (row[key] / maxv * 100)|round(1) }}%"></span></span>
+      <span class="bar-value">{{ row[key] }}</span>
+    </div>
+  {% endfor %}
+</div>
+{% endmacro %}

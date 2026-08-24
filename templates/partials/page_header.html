@@ -1,0 +1,16 @@
+{% macro page_header(title, description) %}
+<div class="page-header">
+  <div>
+    <h1>{{ title }}</h1>
+    {% if description %}<p class="muted">{{ description }}</p>{% endif %}
+  </div>
+  <div class="page-actions">{{ caller() if caller is defined else '' }}</div>
+</div>
+{% endmacro %}
+
+{% macro empty_state(title, description) %}
+<div class="card empty-state">
+  <p class="strong">{{ title }}</p>
+  {% if description %}<p class="muted">{{ description }}</p>{% endif %}
+</div>
+{% endmacro %}
